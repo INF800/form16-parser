@@ -12,6 +12,7 @@ class Parser:
         "Details of Salary Paid and any other income and tax deducted",
         "0-Details of Salary Paid and any other income and tax deducted", # Year 2019
         "Whether opting for taxation u/s 115BAC",
+        "A", # FY2425 (For "Whether opting out of taxation u/s 115BAC(1A)?")
         "Whethe", # Honeywell Part B
         "__no", # Honeywell Part B
         "1.",
@@ -48,6 +49,7 @@ class Parser:
         "(d)",
         "(e)",
         "0-(f)",
+        "0-(h)", # FY2425
         "(g)",
         "(h)",
         "__grossamount__qualifyingamount__deductibleamount",
@@ -55,6 +57,8 @@ class Parser:
         "(j)",
         "(k)",
         "(l)",
+        "(m)", # FY2425
+        "(n)", # FY2425
         "11.",
         "12.",
         "13.",
@@ -379,8 +383,12 @@ class Parser:
             return "PARTB_ANNEXURE1_0_FY1920_FY2021"
         elif len(first_row)>=2 and first_row[1]=="(f)":
             return "PARTB_ANNEXURE1_1"
+        elif len(first_row)>=2 and first_row[1]=="(g)":
+            return "PARTB_ANNEXURE1_1_FY2425"
         elif len(first_row)>=2 and first_row[1]=="0-(f)":
             return "PARTB_ANNEXURE1_2"
+        elif len(first_row)>=2 and first_row[1]=="0-(h)":
+            return "PARTB_ANNEXURE1_2_FY2425"
         elif len(first_row)>=2 and first_row[1]=="2. (f) Break up for ‘Amount of any other exemption under section 10’ to be filled in the table below":
             return "PARTB_SECTION10_2F" # Note: Not processing these tables
         elif len(first_row)>=2 and first_row[1]=="10(k). Break up for ‘Amount deductible under any other provision(s) of Chapter VIA ‘to be filled in the table below":
@@ -399,7 +407,9 @@ class Parser:
             "PARTB_ANNEXURE1_0_FY2122",
             "PARTB_ANNEXURE1_0_FY1920_FY2021",
             "PARTB_ANNEXURE1_1",
+            "PARTB_ANNEXURE1_1_FY2425",
             "PARTB_ANNEXURE1_2",
+            "PARTB_ANNEXURE1_2_FY2425",
         ):
             return True
         return False
@@ -454,6 +464,7 @@ class Parser:
         # flatten the tables
         all_rows = []
         replace_rows_2_and_1 = False
+        gather_extra_rows = False
         for table in tables[1:]:
             table_type = Parser.table_typle(table)
             is_valid_table = Parser.is_valid_table(table_type)
@@ -477,6 +488,10 @@ class Parser:
                     "But stay tuned, future releases will definitely work for them! "
                     "You can remove this execption manually and parse them anyway."
                 )
+
+            # Fix(FY2425): Manage extra columns
+            if table_type in ("PARTB_ANNEXURE1_1_FY2425", "PARTB_ANNEXURE1_2_FY2425"):
+                gather_extra_rows = True
 
             ridx = 0
             while ridx<len(table.dataframe):
@@ -504,10 +519,37 @@ class Parser:
             ]
             all_rows.pop(2)
 
-
         # Fix(2019): replace row 2 with 1
         if replace_rows_2_and_1:
             all_rows[2], all_rows[1] = all_rows[1], all_rows[2]
+
+        # Fix(FY2425): Manage extra columns
+        spl_allowances_sec10_14_fy2425 = {}
+        chapter_vi_a_fy2425 = {}
+        if gather_extra_rows:
+            spl_allowances_sec10_14_fy2425 = {
+                "other_special_allowances_under_section_10_14": [
+                    all_rows[15][3], 
+                    all_rows[15][4],
+                ]
+            }
+            chapter_vi_a_fy2425 = {
+                "deduction_in_respect_of_contribution_by_employee_to_agnipath_scheme_under_section_80cch": [
+                    all_rows[39][3],
+                    all_rows[39][4],
+                ],
+                "deduction_in_respect_of_contribution_by_central_gov_to_agnipath_scheme_under_section_80cch": [
+                    all_rows[40][3],
+                    all_rows[40][4],
+                ],
+            }
+            # Note: pop shifts the indices
+            all_rows.pop(15)
+            all_rows.pop(39) 
+            all_rows.pop(39) 
+            
+            # Fix: replace the empty headers
+            all_rows[38] = [c for c in all_rows[38] if c != ""]
 
         # collect all values (all the row indices are static)
         info["details_of_salary_paid_and_any_other_income_and_tax_deducted"] = {
@@ -552,6 +594,7 @@ class Parser:
                     all_rows[14][3],
                     all_rows[14][4],
                 ],
+                **spl_allowances_sec10_14_fy2425,
                 "amount_of_any_other_exemption_under_section_10": [
                     all_rows[15][3],
                     all_rows[15][4],
@@ -583,7 +626,7 @@ class Parser:
                     all_rows[22][4],  
                 ],
             },
-            "total_amount_of_deductions_under_section 16": [
+            "total_amount_of_deductions_under_section_16": [
                 all_rows[23][3],
                 all_rows[23][4],  
             ],
@@ -639,9 +682,10 @@ class Parser:
                     "deductible_amount": all_rows[37][4],
                 },
                 "deduction_in_respect_of_interest_on_loan_taken_for_higher_education_under_section_80e": {
-                    "gross_amount": all_rows[38][3],
-                    "deductible_amount": all_rows[38][4],
+                    "gross_amount": all_rows[38][3].split("-")[1] if ("-" in all_rows[38][3]) else all_rows[38][3],
+                    "deductible_amount": all_rows[38][4].split("-")[1] if ("-" in all_rows[38][4]) else all_rows[38][4],
                 },
+                **chapter_vi_a_fy2425,
                 "total_deduction_in_respect_of_donations_to_certain_funds_charitable_institutions_etc_under_section_80g": {
                     "gross_amount": all_rows[40][3],
                     "qualifying_amount": all_rows[40][4],
