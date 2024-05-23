@@ -11,7 +11,7 @@ Form 16 parser for TDS
 Install the package using:
 
 ```
-pip install https://github.com/INF800/form16-parser
+pip install git+https://github.com/INF800/form16-parser.git@e83ddad7e18b31f04cb454b3eea5b837ddb0a374#egg=form16_parser
 ```
 
 And parse your Form 16 using:
