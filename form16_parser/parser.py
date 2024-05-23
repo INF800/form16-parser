@@ -551,8 +551,11 @@ class Parser:
             all_rows.pop(39) 
             all_rows.pop(39) 
             
-            # Fix: replace the empty headers
+            # Fix(FY2425): replace the empty headers
             all_rows[38] = [c for c in all_rows[38] if c != ""]
+
+            # Fix(FY2425): whether_opting_for_taxation_us_115bac
+            all_rows[2][2] = all_rows[2][3]
 
         # Fix(FY2425): Overalp issue with specific forms
         if all_rows[3][2] == "Whether opting out of taxation u/s 115BAC(1A)?":
