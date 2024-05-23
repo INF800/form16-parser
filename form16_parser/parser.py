@@ -418,6 +418,8 @@ class Parser:
     def is_valid_part_b_row(row):
         # build query
         query = row[1]
+        if query is None:
+            query = row[2]
         if len(query)>100:
             query = query[:3]
         if query=="":
@@ -544,12 +546,17 @@ class Parser:
                 ],
             }
             # Note: pop shifts the indices
+            # We intend to pop original indices - 15, 39 and 40
             all_rows.pop(15)
             all_rows.pop(39) 
             all_rows.pop(39) 
             
             # Fix: replace the empty headers
             all_rows[38] = [c for c in all_rows[38] if c != ""]
+
+        # Fix(FY2425): Overalp issue with specific forms
+        if all_rows[3][2] == "Whether opting out of taxation u/s 115BAC(1A)?":
+            all_rows[2][2] = all_rows[2][3] # [1, 'A', '', 'No'] -> [1, 'A', 'No', 'No']
 
         # collect all values (all the row indices are static)
         info["details_of_salary_paid_and_any_other_income_and_tax_deducted"] = {

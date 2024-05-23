@@ -138,12 +138,12 @@ from form16_parser import (
             None,
             "../data/0022.json",
         ),
-        # (
-        #     "0023_fy2425_parta_partb_overlap", 
-        #     "../data/0023_fy2425_parta_partb_overlap.pdf",
-        #     None,
-        #     "../data/0024.json",
-        # ),        
+        (
+            "0023_fy2425_parta_partb_overlap", 
+            "../data/0023_fy2425_parta_partb_overlap.pdf",
+            None,
+            "../data/0023.json",
+        ),        
         (
             "0024_fy2425_partb_parta", 
             "../data/0024_fy2425_partb_parta.pdf",
