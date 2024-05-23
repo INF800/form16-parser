@@ -5,6 +5,7 @@ Form 16 parser for TDS
 [![stability-alpha](https://img.shields.io/badge/stability-alpha-f4d03f.svg)](https://github.com/mkenney/software-guides/blob/master/STABILITY-BADGES.md#alpha)
 [![](https://img.shields.io/static/v1?label=Python&message=3.11&color=indigo)](https://github.com/INF800/form16-parser) <img src="https://img.shields.io/github/stars/INF800/form16-parser.svg?style=social&" alt="GitHub stars">
 
+[Live Demo (click here)](https://huggingface.co/spaces/arakesh/form16-parser)
 
 ### Usage:
 
