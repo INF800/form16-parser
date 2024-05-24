@@ -2,7 +2,7 @@
 Form 16 parser for TDS
 
 [![](https://img.shields.io/static/v1?label=Licence&message=MIT&color=darkgreen)](https://github.com/INF800/form16-parser)
-[![](https://img.shields.io/static/v1?label=Release&message=alpha&color=darkgreen)](https://github.com/INF800/form16-parser)
+[![](https://img.shields.io/static/v1?label=Release&message=alpha&color=yellow)](https://github.com/INF800/form16-parser)
 [![](https://img.shields.io/static/v1?label=Python&message=>=3.10&color=indigo)](https://github.com/INF800/form16-parser) <img src="https://img.shields.io/github/stars/INF800/form16-parser.svg?style=social&" alt="GitHub stars">
 
 [Live Demo (click here)](https://huggingface.co/spaces/arakesh/form16-parser)
